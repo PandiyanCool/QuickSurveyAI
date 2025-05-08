@@ -69,7 +69,7 @@ export function SurveyCard({ survey, onDelete }: SurveyCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{survey.title}</CardTitle>
+        <CardTitle>{survey.topic}</CardTitle>
         <CardDescription>
           Created{" "}
           {formatDistanceToNow(new Date(survey.createdAt), { addSuffix: true })}
@@ -116,8 +116,9 @@ export function SurveyCard({ survey, onDelete }: SurveyCardProps) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete the survey "{survey.title}" and
-                  all its responses. This action cannot be undone.
+                  This will permanently delete the survey{" "}
+                  <strong>&ldquo;{survey.topic}&rdquo;</strong> and all its
+                  responses. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

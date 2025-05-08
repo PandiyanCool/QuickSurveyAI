@@ -1,6 +1,7 @@
 export interface Survey {
   id: string;
   title: string;
+  topic: string;
   description: string;
   questions: Question[];
   createdAt: string;
