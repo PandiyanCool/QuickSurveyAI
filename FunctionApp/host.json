@@ -10,6 +10,16 @@
   },
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
-    "version": "[4.*, 5.0.0)"
+    "version": "[3.*, 4.0.0)"
+  },
+  "cors": {
+    "allowedOrigins": [
+      "http://localhost:3000",
+      "https://quicksurveyai.vercel.app",
+      "https://*.vercel.app"
+    ],
+    "allowedMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allowedHeaders": ["*"],
+    "maxAge": 3600
   }
 }

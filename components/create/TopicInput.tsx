@@ -1,14 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Loader2, SparklesIcon } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, SparklesIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const API_BASE_URL =
+  "https://quicksurveyai-functions-app.azurewebsites.net/api";
 
 export function TopicInput() {
   const [topic, setTopic] = useState("");
@@ -28,16 +38,31 @@ export function TopicInput() {
     }
 
     setIsGenerating(true);
-    
+
     try {
-      // In a real app, this would call an API endpoint
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Generate a random ID for demo purposes
-      const surveyId = Math.random().toString(36).substring(2, 12);
-      
+      const response = await fetch(`${API_BASE_URL}/GenerateSurvey`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          topic,
+          numQuestions: 5,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate survey");
+      }
+
+      const data = await response.json();
+
       // Navigate to the preview page with the generated survey
-      router.push(`/create/preview?id=${surveyId}&topic=${encodeURIComponent(topic)}`);
+      router.push(
+        `/create/preview?id=${Date.now()}&topic=${encodeURIComponent(
+          topic
+        )}&questions=${encodeURIComponent(JSON.stringify(data.questions))}`
+      );
     } catch (error) {
       toast({
         title: "Generation Failed",
@@ -57,7 +82,7 @@ export function TopicInput() {
           Enter a topic and we&apos;ll generate relevant questions using AI
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="topic">Survey Topic</Label>
@@ -68,7 +93,7 @@ export function TopicInput() {
             onChange={(e) => setTopic(e.target.value)}
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="description">Description (optional)</Label>
           <Textarea
@@ -80,12 +105,9 @@ export function TopicInput() {
           />
         </div>
       </CardContent>
-      
+
       <CardFooter className="flex justify-end">
-        <Button
-          onClick={handleGenerate}
-          disabled={isGenerating}
-        >
+        <Button onClick={handleGenerate} disabled={isGenerating}>
           {isGenerating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
