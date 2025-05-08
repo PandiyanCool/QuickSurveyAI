@@ -1,9 +1,20 @@
-"use client"
+"use client";
 
-import { Survey, SurveyResponse, Question } from "@/types"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Survey, SurveyResponse, Question } from "@/types";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface AnalyticsSummaryProps {
   survey: Survey;
@@ -15,69 +26,72 @@ export function AnalyticsSummary({ survey, responses }: AnalyticsSummaryProps) {
     if (responses.length === 0) {
       return "No responses yet.";
     }
-    
+
     const answers = responses
-      .flatMap(r => r.answers)
-      .filter(a => a.questionId === question.id);
-    
-    if (question.type === 'text') {
+      .flatMap((r) => r.answers)
+      .filter((a) => a.questionId === question.id);
+
+    if (question.type === "text") {
       return `${answers.length} text responses received.`;
     }
-    
-    if (question.type === 'scale') {
+
+    if (question.type === "scale") {
       const values = answers
-        .map(a => a.value)
-        .filter((value): value is number => typeof value === 'number');
-      
+        .map((a) => a.value)
+        .filter((value): value is number => typeof value === "number");
+
       if (values.length === 0) return "No responses yet.";
-      
-      const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+
+      const average =
+        values.reduce((sum, value) => sum + value, 0) / values.length;
       const highest = Math.max(...values);
       const lowest = Math.min(...values);
-      
-      return `Average rating: ${average.toFixed(1)} out of 10. Highest: ${highest}, Lowest: ${lowest}.`;
+
+      return `Average rating: ${average.toFixed(
+        1
+      )} out of 10. Highest: ${highest}, Lowest: ${lowest}.`;
     }
-    
-    if (question.type === 'radio') {
+
+    if (question.type === "radio") {
       const counts: Record<string, number> = {};
-      
-      answers.forEach(answer => {
-        if (typeof answer.value === 'string') {
+
+      answers.forEach((answer) => {
+        if (typeof answer.value === "string") {
           counts[answer.value] = (counts[answer.value] || 0) + 1;
         }
       });
-      
+
       const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-      
+
       if (entries.length === 0) return "No responses yet.";
-      
+
       const [topOption, topCount] = entries[0];
       const percentage = Math.round((topCount / answers.length) * 100);
-      
+
       return `Most common response: "${topOption}" (${percentage}% of responses).`;
     }
-    
-    if (question.type === 'checkbox') {
+
+    if (question.type === "checkbox") {
       const counts: Record<string, number> = {};
-      
-      answers.forEach(answer => {
+
+      answers.forEach((answer) => {
         if (Array.isArray(answer.value)) {
-          answer.value.forEach(option => {
+          answer.value.forEach((option) => {
             counts[option] = (counts[option] || 0) + 1;
           });
         }
       });
-      
+
       const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-      
+
       if (entries.length === 0) return "No responses yet.";
-      
+
       const [topOption, topCount] = entries[0];
       const percentage = Math.round((topCount / answers.length) * 100);
-      
+
       return `Most selected option: "${topOption}" (selected in ${percentage}% of responses).`;
     }
-    
+
     return "No insights available.";
   };
 
@@ -97,7 +111,9 @@ export function AnalyticsSummary({ survey, responses }: AnalyticsSummaryProps) {
                 <span className="text-left">{question.text}</span>
               </AccordionTrigger>
               <AccordionContent>
-                <p className="text-muted-foreground">{getInsightForQuestion(question)}</p>
+                <p className="text-muted-foreground">
+                  {getInsightForQuestion(question)}
+                </p>
               </AccordionContent>
             </AccordionItem>
           ))}
