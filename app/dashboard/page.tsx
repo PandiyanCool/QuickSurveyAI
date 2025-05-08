@@ -25,7 +25,8 @@ export default function DashboardPage() {
         const response = await fetch(`${API_BASE_URL}/GetSurveys`);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch surveys");
+          const errorData = await response.text();
+          throw new Error(`Failed to fetch surveys: ${errorData}`);
         }
 
         const data = await response.json();
@@ -34,7 +35,10 @@ export default function DashboardPage() {
         console.error("Error fetching surveys:", error);
         toast({
           title: "Error",
-          description: "Failed to load surveys. Please try again.",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Failed to load surveys. Please try again.",
           variant: "destructive",
         });
       } finally {

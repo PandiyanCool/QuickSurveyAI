@@ -104,16 +104,42 @@ export function SurveyPreview({ initialSurvey }: SurveyPreviewProps) {
     setIsSaving(true);
 
     try {
+      // Ensure all questions have required fields
+      const validQuestions = survey.questions.every(
+        (q) => q.text && q.type && q.text.trim() !== ""
+      );
+
+      if (!validQuestions) {
+        toast({
+          title: "Invalid Questions",
+          description: "All questions must have text and type",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/SaveSurvey`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(survey),
+        body: JSON.stringify({
+          topic: survey.title,
+          title: survey.title,
+          description: survey.description,
+          questions: survey.questions.map((q) => ({
+            id: q.id,
+            text: q.text,
+            type: q.type,
+            required: q.required,
+            options: q.options,
+          })),
+        }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save survey");
+        const errorData = await response.json();
+        throw new Error(errorData.body || "Failed to save survey");
       }
 
       const data = await response.json();
@@ -126,10 +152,12 @@ export function SurveyPreview({ initialSurvey }: SurveyPreviewProps) {
         title: "Survey Created!",
         description: "Your survey has been saved and is ready to share.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error saving survey:", error);
       toast({
         title: "Failed to save",
-        description: "Could not save your survey. Please try again.",
+        description:
+          error.message || "Could not save your survey. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -153,12 +181,14 @@ export function SurveyPreview({ initialSurvey }: SurveyPreviewProps) {
             {editingTitle ? (
               <Input
                 value={survey.title}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setSurvey((prev) => ({ ...prev, title: e.target.value }))
                 }
-                onBlur={(e) => updateSurveyTitle(e.target.value)}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && updateSurveyTitle(e.target.value)
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+                  updateSurveyTitle(e.target.value)
+                }
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                  e.key === "Enter" && updateSurveyTitle(e.currentTarget.value)
                 }
                 className="text-2xl font-bold"
                 autoFocus
