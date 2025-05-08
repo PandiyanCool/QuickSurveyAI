@@ -28,8 +28,8 @@ export function AnalyticsSummary({ survey, responses }: AnalyticsSummaryProps) {
     }
 
     const answers = responses
-      .flatMap((r) => r.answers)
-      .filter((a) => a.questionId === question.id);
+      .flatMap((r) => r.responses || [])
+      .filter((a) => a && a.questionId === question.id);
 
     if (question.type === "text") {
       return `${answers.length} text responses received.`;
@@ -76,7 +76,7 @@ export function AnalyticsSummary({ survey, responses }: AnalyticsSummaryProps) {
 
       answers.forEach((answer) => {
         if (Array.isArray(answer.value)) {
-          answer.value.forEach((option) => {
+          answer.value.forEach((option: string | number) => {
             counts[option] = (counts[option] || 0) + 1;
           });
         }
