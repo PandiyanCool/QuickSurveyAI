@@ -105,7 +105,7 @@ export function SurveyForm({ survey }: SurveyFormProps) {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">{survey.title}</CardTitle>
+        <CardTitle className="text-2xl">{survey.topic}</CardTitle>
         <CardDescription>{survey.description}</CardDescription>
       </CardHeader>
 

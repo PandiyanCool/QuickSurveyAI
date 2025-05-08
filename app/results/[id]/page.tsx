@@ -139,7 +139,7 @@ export default function ResultsPage({ params }: ResultsPageProps) {
               <Card>
                 <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <CardTitle className="text-2xl">{survey.title}</CardTitle>
+                    <CardTitle className="text-2xl">{survey.topic}</CardTitle>
                     <CardDescription>{survey.description}</CardDescription>
                   </div>
 

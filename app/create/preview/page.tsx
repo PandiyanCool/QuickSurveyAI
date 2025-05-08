@@ -34,7 +34,7 @@ export default function PreviewPage() {
 
         setSurvey({
           id,
-          title: `${topic} Survey`,
+          topic: `${topic} Survey`,
           description: `Please provide your feedback on ${topic}.`,
           questions,
           createdAt: new Date().toISOString(),

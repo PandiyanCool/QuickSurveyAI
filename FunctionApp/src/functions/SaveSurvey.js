@@ -16,13 +16,13 @@ app.http("SaveSurvey", {
         };
       }
 
-      const { title, topic, description, questions } = body;
+      const { topic, description, questions } = body;
 
-      // Validate required fields - check both title and topic
-      if (!title && !topic) {
+      // Validate required fields
+      if (!topic) {
         return {
           status: 400,
-          body: "Either title or topic is required",
+          body: "Topic is required",
         };
       }
 
@@ -33,15 +33,18 @@ app.http("SaveSurvey", {
         };
       }
 
-      // Validate each question has required fields
-      for (const question of questions) {
-        if (!question.text || !question.type) {
-          return {
-            status: 400,
-            body: "Each question must have text and type",
-          };
-        }
-      }
+      // Transform questions to ensure consistent structure
+      const transformedQuestions = questions.map((q) => ({
+        questionId: q.id,
+        question: {
+          id: q.id,
+          text: q.text,
+          type: q.type,
+          required: q.required || false,
+          options: q.options || [],
+        },
+        type: q.type,
+      }));
 
       const client = new CosmosClient(process.env.COSMOS_DB_CONNECTION_STRING);
       const database = client.database(process.env.COSMOS_DB_NAME);
@@ -49,9 +52,9 @@ app.http("SaveSurvey", {
 
       const surveyItem = {
         id: Date.now().toString(),
-        title: title || topic, // Use title if available, otherwise use topic
+        topic,
         description: description || "",
-        questions,
+        questions: transformedQuestions,
         createdAt: new Date().toISOString(),
         responses: 0,
       };

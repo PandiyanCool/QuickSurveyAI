@@ -124,8 +124,7 @@ export function SurveyPreview({ initialSurvey }: SurveyPreviewProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          topic: survey.title,
-          title: survey.title,
+          topic: survey.topic,
           description: survey.description,
           questions: survey.questions.map((q) => ({
             id: q.id,
@@ -180,7 +179,7 @@ export function SurveyPreview({ initialSurvey }: SurveyPreviewProps) {
           <div className="flex items-center justify-between">
             {editingTitle ? (
               <Input
-                value={survey.title}
+                value={survey.topic}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setSurvey((prev) => ({ ...prev, title: e.target.value }))
                 }
@@ -198,7 +197,7 @@ export function SurveyPreview({ initialSurvey }: SurveyPreviewProps) {
                 className="text-2xl cursor-pointer hover:text-primary transition-colors"
                 onClick={() => setEditingTitle(true)}
               >
-                {survey.title} <PencilIcon className="inline ml-2 h-4 w-4" />
+                {survey.topic} <PencilIcon className="inline ml-2 h-4 w-4" />
               </CardTitle>
             )}
           </div>
