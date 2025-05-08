@@ -9,58 +9,69 @@ import { Button } from "@/components/ui/button";
 import { Survey } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PlusCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const API_BASE_URL =
+  "https://quicksurveyai-functions-app.azurewebsites.net/api";
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [surveys, setSurveys] = useState<Survey[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchSurveys = async () => {
-      // In a real app, we'd make an API call
-      // For demo purposes, we'll simulate the response
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      try {
+        const response = await fetch(`${API_BASE_URL}/GetSurveys`);
 
-      const mockSurveys: Survey[] = [
-        {
-          id: "survey1",
-          title: "Product Feedback Survey",
-          description: "Gathering user feedback about our new product features",
-          questions: Array(4).fill({}),
-          createdAt: new Date().toISOString(),
-          responses: 37,
-        },
-        {
-          id: "survey2",
-          title: "Customer Satisfaction Survey",
-          description: "Evaluating customer support and overall experience",
-          questions: Array(5).fill({}),
-          createdAt: new Date(
-            Date.now() - 3 * 24 * 60 * 60 * 1000
-          ).toISOString(),
-          responses: 123,
-        },
-        {
-          id: "survey3",
-          title: "Website Usability Study",
-          description:
-            "Collecting insights on website navigation and user experience",
-          questions: Array(6).fill({}),
-          createdAt: new Date(
-            Date.now() - 7 * 24 * 60 * 60 * 1000
-          ).toISOString(),
-          responses: 89,
-        },
-      ];
+        if (!response.ok) {
+          throw new Error("Failed to fetch surveys");
+        }
 
-      setSurveys(mockSurveys);
-      setLoading(false);
+        const data = await response.json();
+        setSurveys(data);
+      } catch (error) {
+        console.error("Error fetching surveys:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load surveys. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchSurveys();
-  }, []);
+  }, [toast]);
 
-  const handleDelete = (id: string) => {
-    setSurveys(surveys.filter((survey) => survey.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/DeleteSurvey`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete survey");
+      }
+
+      setSurveys(surveys.filter((survey) => survey.id !== id));
+      toast({
+        title: "Success",
+        description: "Survey deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting survey:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete survey. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
