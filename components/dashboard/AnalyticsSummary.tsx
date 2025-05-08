@@ -26,9 +26,8 @@ export function AnalyticsSummary({ survey, responses }: AnalyticsSummaryProps) {
     if (responses.length === 0) {
       return "No responses yet.";
     }
-
     const answers = responses
-      .flatMap((r) => r.responses || [])
+      .flatMap((r) => r.answers || [])
       .filter((a) => a && a.questionId === question.id);
 
     if (question.type === "text") {
